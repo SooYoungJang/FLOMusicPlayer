@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/musicPlayFragment">
+
+    <fragment
+        android:id="@+id/musicPlayFragment"
+        android:name="com.example.flomusicplayer.presentation.view.main.MusicPlayFragment"
+        android:label="fragment_music_play"
+        tools:layout="@layout/fragment_music_play" >
+        <action
+            android:id="@+id/action_musicPlayFragment_to_lyricsFragment"
+            app:destination="@id/lyricsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/lyricsFragment"
+        android:name="com.example.flomusicplayer.presentation.view.lyrics.LyricsFragment"
+        android:label="fragment_lyrics"
+        tools:layout="@layout/fragment_lyrics" >
+        <action
+            android:id="@+id/action_lyricsFragment_to_musicPlayFragment"
+            app:destination="@id/musicPlayFragment" />
+    </fragment>
+</navigation>
