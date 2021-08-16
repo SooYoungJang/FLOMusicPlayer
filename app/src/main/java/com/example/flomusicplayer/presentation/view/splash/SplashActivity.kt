@@ -2,10 +2,10 @@ package com.example.flomusicplayer.presentation.view.splash
 
 import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.example.flomusicplayer.presentation.view.MainActivity
+import androidx.appcompat.app.AppCompatActivity
 import com.example.flomusicplayer.R
+import com.example.flomusicplayer.presentation.view.MainActivity
 import kotlinx.coroutines.*
 
 class SplashActivity : AppCompatActivity() {
@@ -24,13 +24,12 @@ class SplashActivity : AppCompatActivity() {
     }
 
     fun startMainActivity(context: Context) = runBlocking<Unit> {
-        GlobalScope.launch {
-            delay(2000)
-            if(!isBackPressed) {
-                val intent = Intent(context, MainActivity::class.java)
-                startActivity(intent)
-                finish()
-            }
+        CoroutineScope(Dispatchers.Main).launch {
+            delay(2000L)
+            val intent = Intent(this@SplashActivity, MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NO_HISTORY
+            startActivity(intent)
+            finish()
         }
     }
 

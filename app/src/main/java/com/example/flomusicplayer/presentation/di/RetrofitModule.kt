@@ -1,6 +1,6 @@
 package com.example.flomusicplayer.presentation.di
 
-import com.example.flomusicplayer.BuildConfig
+import androidx.databinding.ktx.BuildConfig
 import com.example.flomusicplayer.data.api.FLOMusicAPIService
 import dagger.Module
 import dagger.Provides
