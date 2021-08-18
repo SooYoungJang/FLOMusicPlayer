@@ -2,31 +2,27 @@ package com.example.flomusicplayer.presentation.viewmodel.musicplay
 
 import android.util.Log
 import android.widget.Toast
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.example.flomusicplayer.data.model.MusicItem
 import com.example.flomusicplayer.data.util.Resource
 import com.example.flomusicplayer.domain.usecase.GetMusicListsFromAPIUseCase
+import com.example.flomusicplayer.presentation.data.LyricsManager
+import com.example.flomusicplayer.presentation.viewmodel.util.ConvertLyrics
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MusicPlayFragmentViewModel @Inject constructor (private val getMusicListsFromAPIUseCase: GetMusicListsFromAPIUseCase) : ViewModel() {
-    private val _musicListsLiveData = MutableLiveData<Resource<MusicItem>>()
-
-    val musicListsLiveData: LiveData<Resource<MusicItem>>
-        get() = _musicListsLiveData
+class MusicPlayFragmentViewModel @Inject constructor(
+    private val getMusicListsFromAPIUseCase: GetMusicListsFromAPIUseCase,
+    private val lyricsManager: LyricsManager
+) : ViewModel() {
 
     fun getMusicLists() = viewModelScope.launch(Dispatchers.IO) {
-//        _musicListsLiveData.postValue(Resource.Loading())
         try {
-            val resource  = getMusicListsFromAPIUseCase.execute()
-//            _musicListsLiveData.postValue(resource)
-            resource.let {response->
+            val resource = getMusicListsFromAPIUseCase.execute()
+            resource.let { response ->
                 when (response) {
                     is Resource.Success -> {
                         response.data?.let {
@@ -34,11 +30,18 @@ class MusicPlayFragmentViewModel @Inject constructor (private val getMusicListsF
                             setAlbum(it.album)
                             setTitle(it.title)
                             setSinger(it.singer)
+                            setFile(it.file)
+                            ConvertLyrics.convertSplitLyrics(it.lyrics).let {
+                                setCurLyrics(it.second.get(0))
+                                setNextLyrics(it.second.get(1))
+                                lyricsManager.add(it.first, it.second)
+                            }
+
                         }
                     }
                     is Resource.Error -> {
                         response.data?.let {
-                          Log.d("ss","FSFSDFSFDSFSDFSDFSDF ")
+
                         }
                     }
                     is Resource.Loading -> {
@@ -47,23 +50,47 @@ class MusicPlayFragmentViewModel @Inject constructor (private val getMusicListsF
                 }
             }
 
-        }catch (e: Exception) {
+        } catch (e: Exception) {
             e.message?.let {
-                _musicListsLiveData.postValue(Resource.Error(it))
+                Log.d("musicViewModel", "error : $it")
             }
         }
     }
 
-    private val _image : MutableLiveData<String> by lazy {
+    private val _file: MutableLiveData<String> by lazy {
+        MutableLiveData<String>().apply {
+            postValue("")
+        }
+    }
+    val file: LiveData<String>
+        get() = _file
+
+    private val _curLyric: MutableLiveData<String> by lazy {
+        MutableLiveData<String>().apply {
+            postValue("")
+        }
+    }
+    val curLyric: LiveData<String>
+        get() = _curLyric
+
+    private val _nextLyric: MutableLiveData<String> by lazy {
+        MutableLiveData<String>().apply {
+            postValue("")
+        }
+    }
+    val nextLyric: LiveData<String>
+        get() = _nextLyric
+
+    private val _image: MutableLiveData<String> by lazy {
         MutableLiveData<String>().apply {
             postValue("")
         }
     }
 
-    val image : LiveData<String>
+    val image: LiveData<String>
         get() = _image
 
-    private val _title : MutableLiveData<String> by lazy {
+    private val _title: MutableLiveData<String> by lazy {
         MutableLiveData<String>().apply {
             postValue("")
         }
@@ -71,7 +98,7 @@ class MusicPlayFragmentViewModel @Inject constructor (private val getMusicListsF
     val title: LiveData<String>
         get() = _title
 
-    private val _singer : MutableLiveData<String> by lazy {
+    private val _singer: MutableLiveData<String> by lazy {
         MutableLiveData<String>().apply {
             postValue("")
         }
@@ -79,7 +106,7 @@ class MusicPlayFragmentViewModel @Inject constructor (private val getMusicListsF
     val singer: LiveData<String>
         get() = _singer
 
-    private val _album : MutableLiveData<String> by lazy {
+    private val _album: MutableLiveData<String> by lazy {
         MutableLiveData<String>().apply {
             postValue("")
         }
@@ -88,28 +115,36 @@ class MusicPlayFragmentViewModel @Inject constructor (private val getMusicListsF
         get() = _album
 
     fun setTitle(title: String) {
-        Log.d("sfdsf" , "sss + $title")
         _title.postValue(title)
     }
+
     fun setSinger(singer: String) {
         _singer.postValue(singer)
     }
+
     fun setAlbum(album: String) {
         _album.postValue(album)
     }
+
     fun setImage(image: String) {
-        Log.d("sfdsf" , "sss + $image")
         _image.postValue(image)
     }
 
-    fun sdf(): Array<String?> {
-
-       var s = _album.value
-       var d1 = _image.value
-       var e = _singer.value
-       var q = _title.value
-        var ss = arrayOf(s,d1,e,q)
-        return ss
+    fun setCurLyrics(lyrics: String) {
+        _curLyric.postValue(lyrics)
     }
+
+    fun setNextLyrics(lyrics: String) {
+        _nextLyric.postValue(lyrics)
+    }
+
+    fun setFile(file: String) {
+        _file.postValue(file)
+    }
+
+//    fun updateLyric(curIdx: Int) {
+//        _curLyric.value = lyricManager.get(curIdx)?.content ?: lyricManager.get(nextIdx)?.content
+//        _nextLyric.value = lyricManager.get(nextIdx)?.content ?: ""
+//    }
 
 }
