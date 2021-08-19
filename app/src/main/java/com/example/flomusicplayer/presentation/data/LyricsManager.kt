@@ -26,12 +26,24 @@ class LyricsManager  {
         return Pair(null, null)
     }
 
+    fun getIdx(time: Long) : Int {
+        if(lyricsInfo.size > 0) {
+            return findLowerBound(time)
+        }else {
+            return 0
+        }
+    }
+
     fun getLyrics() : MutableList<LyricsInfo>?{
         if(lyricsInfo.size > 0) {
             return lyricsInfo
         }else {
             return null
         }
+    }
+
+    fun getLyricsIdx(idx: Int) : LyricsInfo {
+        return lyricsInfo.get(idx)
     }
 
     fun findLowerBound(target: Long): Int {

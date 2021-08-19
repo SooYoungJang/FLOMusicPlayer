@@ -34,13 +34,11 @@ class MusicPlayFragment : Fragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-
         if (context is OnMusicInfoReceivedListener) {
             mListener = context as OnMusicInfoReceivedListener
         } else {
             throw ClassCastException("$context must implement OnFragmentInteractionListener")
         }
-
     }
 
     override fun onCreateView(

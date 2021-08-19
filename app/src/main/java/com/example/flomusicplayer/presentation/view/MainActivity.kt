@@ -19,7 +19,7 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class MainActivity :  AppCompatActivity(), MusicPlayFragment.OnMusicInfoReceivedListener {
+class MainActivity :  AppCompatActivity(), MusicPlayFragment.OnMusicInfoReceivedListener,LyricsFragment.OnTimeSelectedListener,LyricsFragment.OnBackKeyPressedListener {
     private lateinit var dataBinding: ActivityMainBinding
     val mainViewModel: MainViewModel by viewModels()
     @Inject lateinit var lyricsManager: LyricsManager
@@ -33,12 +33,13 @@ class MainActivity :  AppCompatActivity(), MusicPlayFragment.OnMusicInfoReceived
 
 
         exoPlayerView.setProgressUpdateListener { position, bufferedPosition ->
+            mainViewModel.setPosition(position)
             val lyricsInfo = lyricsManager.get(position)
             lyricsInfo.first?.content?.let { musicFragment.musicPlayViewModel.setCurLyrics(it) }
             lyricsInfo.second?.content?.let { musicFragment.musicPlayViewModel.setNextLyrics(it) }
+
         }
     }
-
 
     override fun onResume() {
         super.onResume()
@@ -61,7 +62,7 @@ class MainActivity :  AppCompatActivity(), MusicPlayFragment.OnMusicInfoReceived
             val mediaItem = MediaItem.fromUri(url)
             it.setMediaItem(mediaItem)
             it.prepare()
-            it.seekTo(mainViewModel.currentWindow, mainViewModel.position)
+            mainViewModel.position.value?.let { it1 -> it.seekTo(mainViewModel.currentWindow, it1) }
 //            it.playWhenReady = viewModel.playWhenReady
         }
     }
@@ -72,17 +73,30 @@ class MainActivity :  AppCompatActivity(), MusicPlayFragment.OnMusicInfoReceived
             val mediaItem = MediaItem.fromUri(url)
             it.setMediaItem(mediaItem)
             it.prepare()
-            it.seekTo(mainViewModel.currentWindow, mainViewModel.position)
+            mainViewModel.position.value?.let { it1 -> it.seekTo(mainViewModel.currentWindow, it1) }
         }
     }
     private fun releasePlayer() {
         mainViewModel.apply {
             player?.let {
+                setPosition(it.currentPosition)
                 playbackPosition = it.currentPosition
                 currentWindow = it.currentWindowIndex
                 it.release()
                 player = null
             }
         }
+    }
+
+    override fun onTimeSelected(changedTime: Long) {
+        val lyricsInfo = lyricsManager.get(changedTime)
+        lyricsInfo.second?.time?.plus(1L)?.let { mainViewModel.player?.seekTo(it) }
+        mainViewModel.player?.apply {
+            mainViewModel.setPosition(currentPosition)
+        }
+    }
+
+    override fun onBackKeyPressed() {
+        this@MainActivity.onBackPressed()
     }
 }

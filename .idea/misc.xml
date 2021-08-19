@@ -12,6 +12,7 @@
         <entry key="app/src/main/res/layout/activity_splash.xml" value="0.13645833333333332" />
         <entry key="app/src/main/res/layout/fragment_lyrics.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_music_play.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/lyric_item.xml" value="0.11770833333333333" />
         <entry key="app/src/main/res/layout/lyrics_item.xml" value="0.11770833333333333" />
         <entry key="app/src/main/res/xml/network_security_config.xml" value="0.1" />
       </map>

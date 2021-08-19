@@ -8,15 +8,18 @@ import com.google.android.exoplayer2.SimpleExoPlayer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
-@HiltViewModel
-class MainViewModel @Inject constructor(private val lyricsManager: LyricsManager) : ViewModel() {
+class MainViewModel : ViewModel() {
     var player : SimpleExoPlayer? = null
     var file: String? = null
     var currentWindow: Int = 0
-    var position: Long = 0
+    private val _position = MutableLiveData<Long>()
+    val position : LiveData<Long>
+        get() = _position
+
+    fun setPosition(position: Long) {
+        _position.value = position
+    }
+
     var playbackPosition: Long = 0
-
-    val currentPosition
-      get() = lyricsManager.idx
-
+    
 }
