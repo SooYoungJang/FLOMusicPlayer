@@ -21,5 +21,5 @@ class MainViewModel : ViewModel() {
     }
 
     var playbackPosition: Long = 0
-    
+
 }
